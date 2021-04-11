@@ -1,35 +1,50 @@
-<!--DIを使用し、GameConsole->BioHazardへの依存性を低くしたクラス-->
+<!--GameCardインターフェースを使用することにより、さらに依存性を下げたクラス-->
+<!--GameConsole → GameCard ← BioHazard という依存関係になっている-->
 
 <?php
 class GameConsole {
-    protected $game;
-    protected $name;
+    protected GameCard $gameCard;
 
-    // BioHazardクラスを継承するクラスであれば使える
-    public function __construct(BioHazard $bioHazard)
+    // GameCardインターフェースに依存する
+    public function __construct(GameCard $gameCard)
     {
-        $this->game = $bioHazard;
-        $this->name = $this->game->displayName;
+        $this->gameCard = $gameCard;
     }
 
-    public function run()
+    public function run(): void
     {
-        print $this->name . '起動' . '<br>';
+        print $this->gameCard->displayName() . '起動' . '<br>';
     }
 }
 
-class BioHazard {
-    public $displayName = 'バイオハザード（無印）';
+interface GameCard {
+    public function displayName();
 }
 
-class BioHazardOutBreak extends BioHazard {
-    public $displayName = 'バイオハザード アウトブレイク';
+// GameCardインターフェースに属する
+class BioHazard implements GameCard {
+    public string $name = 'バイオハザード（無印）';
+
+    public function displayName(): string
+    {
+        return $this->name;
+    }
 }
 
-// ここでBioHazardクラスを注入
+// GameCardインターフェースに属する
+class BioHazardRE2 implements GameCard {
+    public string $name = 'バイオハザード RE2';
+
+    public function displayName(): string
+    {
+        return $this->name;
+    }
+}
+
+// GameCardインターフェースに属したBioHazardクラスを注入
 $gameConsole = new GameConsole(new BioHazard);
 $gameConsole->run();
 
-// ここでBioHazardOutBreakクラス(BioHazardを継承)を注入
-$gameConsole = new GameConsole(new BioHazardOutBreak);
+// GameCardインターフェースに属したBioHazardRE2クラスを注入
+$gameConsole = new GameConsole(new BioHazardRE2);
 $gameConsole->run();
