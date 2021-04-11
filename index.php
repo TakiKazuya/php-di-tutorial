@@ -1,23 +1,35 @@
-<!--DIを使用しない（GameConsoleがBioHazardに依存している）クラス-->
+<!--DIを使用し、GameConsole->BioHazardへの依存性を低くしたクラス-->
 
 <?php
 class GameConsole {
     protected $game;
+    protected $name;
 
-    public function __construct()
+    // BioHazardクラスを継承するクラスであれば使える
+    public function __construct(BioHazard $bioHazard)
     {
-        $this->game = new BioHazard();
+        $this->game = $bioHazard;
+        $this->name = $this->game->displayName;
     }
 
     public function run()
     {
-        print 'ゲーム起動';
+        print $this->name . '起動' . '<br>';
     }
 }
 
 class BioHazard {
+    public $displayName = 'バイオハザード（無印）';
 }
 
-$gameConsole = new GameConsole();
+class BioHazardOutBreak extends BioHazard {
+    public $displayName = 'バイオハザード アウトブレイク';
+}
 
+// ここでBioHazardクラスを注入
+$gameConsole = new GameConsole(new BioHazard);
+$gameConsole->run();
+
+// ここでBioHazardOutBreakクラス(BioHazardを継承)を注入
+$gameConsole = new GameConsole(new BioHazardOutBreak);
 $gameConsole->run();
